@@ -136,7 +136,7 @@ os_file_read(char *file_path, void *dest, size_t num_bytes)
         DWORD bytes_to_read_dword;
         DWORD bytes_read_dword;
 
-        bytes_to_read_dword = (DWORD)(bytes_to_read & 0xffff);
+        bytes_to_read_dword = (DWORD)(bytes_to_read & 0xffffffff);
 
         operation_result = ReadFile(
             h_file, dest,
@@ -178,7 +178,7 @@ os_file_write(char *file_path, void *src, size_t num_bytes)
         DWORD bytes_to_write_dword;
         DWORD bytes_written_dword;
 
-        bytes_to_write_dword = (DWORD)(bytes_to_write & 0xffff);
+        bytes_to_write_dword = (DWORD)(bytes_to_write & 0xffffffff);
 
         operation_result = WriteFile(
             h_file, src,
