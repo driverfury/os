@@ -44,7 +44,7 @@ os_memory_alloc(size_t size)
         return(0);
     }
 
-    void *result =(void *)HeapAlloc(process_heap, 0, size);
+    result = (void *)HeapAlloc(process_heap, 0, size);
     return(result);
 }
 
