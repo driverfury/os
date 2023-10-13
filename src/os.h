@@ -14,7 +14,7 @@ size_t os_file_read(char *file_path, void *dest, size_t num_bytes);
 size_t os_file_write(char *file_path, void *src, size_t num_bytes);
 
 /* Time */
-size_t os_time_now_microseconds(void);
+unsigned long long os_time_now_microseconds(void);
 
 /* Libraries */
 typedef void (*os_proc)();
@@ -30,16 +30,21 @@ void    os_lib_release(int os_lib);
 #include <windows.h>
 
 #define OS_LARGE_INTEGER_TO_SIZE_T(large_int)\
-            (((size_t)((large_int).u.LowPart) << 0) |\
-             ((size_t)((large_int).u.HighPart) << 32));
+            (((unsigned long long)((large_int).u.LowPart) << 0) |\
+             ((unsigned long long)((large_int).u.HighPart) << 32));
 
 void*
 os_memory_alloc(size_t size)
 {
-    void *result = VirtualAlloc(
-            0, size,
-            MEM_RESERVE | MEM_COMMIT,
-            PAGE_READWRITE);
+    void *result = 0;
+
+    HANDLE process_heap = GetProcessHeap();
+    if(!process_heap)
+    {
+        return(0);
+    }
+
+    void *result =(void *)HeapAlloc(process_heap, 0, size);
     return(result);
 }
 
@@ -197,13 +202,13 @@ os_file_write(char *file_path, void *src, size_t num_bytes)
     return(bytes_written);
 }
 
-size_t
+unsigned long long
 os_time_now_microseconds(void)
 {
-    size_t result = 0;
+    unsigned long long result = 0;
     LARGE_INTEGER performance_counter = {0};
     LARGE_INTEGER performance_frequency = {0};
-    size_t ticks, ticks_per_second;
+    unsigned long long ticks, ticks_per_second;
 
     if( QueryPerformanceCounter(&performance_counter) &&
         QueryPerformanceFrequency(&performance_frequency))
